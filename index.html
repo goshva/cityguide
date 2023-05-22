@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Гео гид Кисловодск</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div id="app">
         <header>
@@ -20,14 +22,15 @@
                     <div class="col-sm-12 col-md-4">
                         <img :src="src">
                         <ul class="list-group">
-                            <li class="list-group-item" v-for="(location, index) in locations" :key="index" @click="playAudio(index)">
+                            <li class="list-group-item" v-for="(location, index) in locations" :key="index"
+                                @click="playAudio(index)">
                                 {{ location.name }} ({{ location.distance.toFixed(2) }} km)
                             </li>
                         </ul>
                     </div>
                     <div class="col-sm-12 col-md-8">
-                        <audio controls ref="audio"  autoplay="true" muted="muted" id = "gogogo" >
-                            <source :src="currentAudio" type="audio/mpeg" muted="muted"  autoplay="true" >
+                        <audio controls ref="audio" autoplay="true" muted="muted" id="gogogo">
+                            <source :src="currentAudio" type="audio/mpeg" muted="muted" autoplay="true">
                         </audio>
                     </div>
                 </div>
@@ -35,23 +38,19 @@
         </main>
 
         <footer>
-            {{ userLatitude                       }}
-            {{ userLongitude                       }}
-            {{ locations}}
-            <p>&copy; 2023 City Audio Guide with Geolocation</p>
         </footer>
     </div>
 
     <script>
-document.addEventListener('click', musicPlay);
-function musicPlay() {
-    document.getElementById('gogogo').play();
-    document.removeEventListener('click', musicPlay);
-}
+        document.addEventListener('click', musicPlay);
+        function musicPlay() {
+            document.getElementById('gogogo').play();
+            document.removeEventListener('click', musicPlay);
+        }
 
         var app = new Vue({
             el: '#app',
-            
+
             data: {
                 locations: [
                     { name: 'kolonada 1', audioUrl: 'kolonada.mp3', latitude: 43.8984901, longitude: 42.7099261, distance: 0 },
@@ -63,11 +62,11 @@ function musicPlay() {
                 userLongitude: null,
 
             },
-            computed:{
+            computed: {
                 src: function () {
-      src =  `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude}`
-      return src
-    }
+                    src = `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude}`
+                    return src
+                }
             },
             mounted() {
                 navigator.geolocation.watchPosition(this.updateUserLocation);
@@ -75,10 +74,10 @@ function musicPlay() {
             methods: {
                 playAudio(index) {
                     this.currentAudio = this.locations[index].audioUrl;
-                    this.$refs.autoplay  = true;
+                    this.$refs.autoplay = true;
                     this.$refs.muted = false;
                     this.$refs.audio.load();
-                        this.$refs.audio.play();
+                    this.$refs.audio.play();
                 },
                 updateUserLocation(position) {
                     this.userLatitude = position.coords.latitude;
@@ -100,14 +99,14 @@ function musicPlay() {
 
                 getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
                     var R = 6371; // Radius of the earth in km
-                    var dLat = (lat2-lat1)* (Math.PI/180);  // deg2rad below
-                    var dLon = (lon2-lon1)* (Math.PI/180); 
-                    var a = 
-                        Math.sin(dLat/2) * Math.sin(dLat/2) +
-                        Math.cos(lat1* (Math.PI/180)) * Math.cos(lat2* (Math.PI/180)) * 
-                        Math.sin(dLon/2) * Math.sin(dLon/2)
-                        ; 
-                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+                    var dLat = (lat2 - lat1) * (Math.PI / 180);  // deg2rad below
+                    var dLon = (lon2 - lon1) * (Math.PI / 180);
+                    var a =
+                        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+                        ;
+                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                     var d = R * c; // Distance in km
                     return d;
                 },
@@ -116,4 +115,5 @@ function musicPlay() {
         });
     </script>
 </body>
+
 </html>
