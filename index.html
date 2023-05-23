@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Гео гид Кисловодск</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-yandex-maps@0.11.15/dist/vue-yandex-maps.min.js"></script>
@@ -19,9 +20,12 @@
 
                 <div class="row">
                     <div class="col-sm-12 col-md-4">
-                        <h1>Гео гид Кисловодск</h1>
+                        <h1>Гео аудио гид Кисловодск</h1>
 
                         <img :src="src">
+                        <audio controls ref="audio" autoplay="true" muted="true" id="gogogo">
+                            <source :src="currentAudio" type="audio/mpeg">
+                        </audio>
 
                         <ul class="list-group">
                             <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -33,13 +37,10 @@
                         </ul>
 
                     </div>
-                    <div class="col-sm-12 col-md-8">
-                        <audio controls ref="audio" autoplay="true" muted="true" id="gogogo">
-                            <source :src="currentAudio" type="audio/mpeg">
-                        </audio>
-                    </div>
                 </div>
             </div>
+            {{ minDistanceObject}}
+
         </main>
 
         <footer>
@@ -57,7 +58,9 @@
                     { name: 'Статуя Влюбленные', audioUrl: 'lovers.mp3', latitude: 43.8936454, longitude: 42.7060095, distance: 0 },
                     { name: 'Вечный огонь', audioUrl: 'voin.mp3', latitude: 43.912797, longitude: 42.712499, distance: 0 }
                 ],
-                currentAudio: '',
+                currentAudio: 'intro.mp3',
+                nearLatitude: null,
+                nearLongitude: null,
                 userLatitude: null,
                 userLongitude: null,
 
@@ -65,10 +68,20 @@
             computed: {
                 src: function () {
                     //                    src = `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude}`
-                    src = `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude},ya_ru~42.716972,43.898676,flag`
+                    src = `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude},ya_ru~${this.nearLongitude},${this.nearLatitude},flag`
 
                     return src
-                }
+                },
+
+                minDistanceObject: function() { 
+                    this.locations.reduce((min, current) => {
+                        let minDistanceObject = current.distance < min.distance ? current : min;
+                        this.nearLatitude =minDistanceObject.latitude
+                        this.nearLongitude =minDistanceObject.longitude
+                        return minDistanceObject;
+                        });
+                    }
+
             },
             mounted() {
                 navigator.geolocation.watchPosition(this.updateUserLocation);
@@ -98,7 +111,6 @@
 
                     this.locations.sort((a, b) => a.distance - b.distance);
                 },
-
                 getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
                     var R = 6371; // Radius of the earth in km
                     var dLat = (lat2 - lat1) * (Math.PI / 180);  // deg2rad below
