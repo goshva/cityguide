@@ -12,7 +12,6 @@
 <body>
     <div id="app">
         <header>
-            <h1>Гео гид Кисловодск</h1>
         </header>
 
         <main>
@@ -20,17 +19,23 @@
 
                 <div class="row">
                     <div class="col-sm-12 col-md-4">
+                        <h1>Гео гид Кисловодск</h1>
+
                         <img :src="src">
+
                         <ul class="list-group">
-                            <li class="list-group-item" v-for="(location, index) in locations" :key="index"
-                                @click="playAudio(index)">
-                                {{ location.name }} ({{ location.distance.toFixed(2) }} km)
+                            <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                                v-for="(location, index) in locations" :key="index" @click="playAudio(index)">
+                                {{ location.name }}
+                                <span class="badge badge-light badge-pill">{{ location.distance.toFixed(2) }} км </span>
                             </li>
+
                         </ul>
+
                     </div>
                     <div class="col-sm-12 col-md-8">
-                        <audio controls ref="audio" autoplay="true" muted="muted" id="gogogo">
-                            <source :src="currentAudio" type="audio/mpeg" muted="muted" autoplay="true">
+                        <audio controls ref="audio" autoplay="true" muted="true" id="gogogo">
+                            <source :src="currentAudio" type="audio/mpeg">
                         </audio>
                     </div>
                 </div>
@@ -42,20 +47,15 @@
     </div>
 
     <script>
-        document.addEventListener('click', musicPlay);
-        function musicPlay() {
-            document.getElementById('gogogo').play();
-            document.removeEventListener('click', musicPlay);
-        }
 
         var app = new Vue({
             el: '#app',
 
             data: {
                 locations: [
-                    { name: 'kolonada 1', audioUrl: 'kolonada.mp3', latitude: 43.8984901, longitude: 42.7099261, distance: 0 },
-                    { name: 'lovers 2', audioUrl: 'lovers.mp3', latitude: 43.8936454, longitude: 42.7060095, distance: 0 },
-                    { name: 'voin 3', audioUrl: 'voin.mp3', latitude: 43.912797, longitude: 42.712499, distance: 0 }
+                    { name: 'Колонада', audioUrl: 'kolonada.mp3', latitude: 43.898676, longitude: 42.716972, distance: 0 },
+                    { name: 'Статуя Влюбленные', audioUrl: 'lovers.mp3', latitude: 43.8936454, longitude: 42.7060095, distance: 0 },
+                    { name: 'Вечный огонь', audioUrl: 'voin.mp3', latitude: 43.912797, longitude: 42.712499, distance: 0 }
                 ],
                 currentAudio: '',
                 userLatitude: null,
@@ -64,7 +64,9 @@
             },
             computed: {
                 src: function () {
-                    src = `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude}`
+                    //                    src = `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude}`
+                    src = `https://static-maps.yandex.ru/1.x/?l=map&pt=${this.userLongitude},${this.userLatitude},ya_ru~42.716972,43.898676,flag`
+
                     return src
                 }
             },
@@ -75,7 +77,7 @@
                 playAudio(index) {
                     this.currentAudio = this.locations[index].audioUrl;
                     this.$refs.autoplay = true;
-                    this.$refs.muted = false;
+                    this.$refs.muted = true;
                     this.$refs.audio.load();
                     this.$refs.audio.play();
                 },
@@ -90,7 +92,7 @@
                         let distance = this.getDistanceFromLatLonInKm(location.latitude, location.longitude, this.userLatitude, this.userLongitude);
                         this.locations[i].distance = distance;
                         if (distance < 0.1) {
-                            this.playAudio(0)
+                            this.playAudio(i)
                         }
                     }
 
